@@ -17,8 +17,14 @@ class SoundBot extends Discord.Client {
   }
 
   _readyListener() {
-    const avatar = Util.avatarExists() ? './config/avatar.png' : null;
-    this.user.setAvatar(avatar);
+/*  const avatar = Util.avatarExists() ? './config/avatar.png' : null;
+ 	this.user.setGame("Sweet Memes");
+	this.user.setUsername('PaulBot')
+    .then(user => console.log(`My new username is ${user.username}`))
+    .catch(console.error);
+	this.user.setAvatar('./config/avatar.png')
+    .then(user => console.log(`New avatar set!`))
+    .catch(console.error); */
   }
 
   _messageListener(message) {
@@ -37,6 +43,9 @@ class SoundBot extends Discord.Client {
   handle(message) {
     const [command, ...input] = message.content.split(' ');
     switch (command) {
+	  case 'uptime':
+		message.channel.send(Util.msToHms(this.uptime));
+		break
       case 'commands':
         message.author.send(Util.getListOfCommands());
         break;
@@ -72,7 +81,7 @@ class SoundBot extends Discord.Client {
     const voiceChannel = message.member.voiceChannel;
 
     if (voiceChannel === undefined) {
-      message.reply('Join a voice channel first!');
+      // message.reply('Join a voice channel first!');
       return;
     }
 
