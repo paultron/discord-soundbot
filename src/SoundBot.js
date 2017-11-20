@@ -17,8 +17,8 @@ class SoundBot extends Discord.Client {
   }
 
   _readyListener() {
+	this.user.setGame("Sweet Memes");
 /*  const avatar = Util.avatarExists() ? './config/avatar.png' : null;
- 	this.user.setGame("Sweet Memes");
 	this.user.setUsername('PaulBot')
     .then(user => console.log(`My new username is ${user.username}`))
     .catch(console.error);
@@ -45,6 +45,12 @@ class SoundBot extends Discord.Client {
     switch (command) {
 	  case 'uptime':
 		message.channel.send(Util.msToHms(this.uptime));
+		break
+	  case 'joinvoice':
+		this.joinChannel(message);
+		break
+	  case 'leavevoice':
+	    this.leaveChannel(message);
 		break
       case 'commands':
         message.author.send(Util.getListOfCommands());
@@ -87,6 +93,10 @@ class SoundBot extends Discord.Client {
 
     switch (message.content) {
       case 'stop':
+	    if (voiceChannel === undefined) {
+        message.reply('Join a voice channel first!');
+        return;
+	    }
         voiceChannel.leave();
         this.queue = [];
         break;
@@ -103,6 +113,32 @@ class SoundBot extends Discord.Client {
         break;
     }
   }
+  
+  joinChannel(message) {
+      const voiceChannel = message.member.voiceChannel;
+	  //future, join a channel on start
+	  //let channel = client.channels.get('379038262167339009');
+      if (voiceChannel === undefined) {
+      message.reply('Join a voice channel first!');
+	  return;
+	  }
+	  else {voiceChannel.join()
+	  .then(connection => console.log('Connected!'))
+      .catch(console.error);
+	  return;
+	  }
+  }
+  
+  leaveChannel(message) {
+	  const voiceChannel = message.member.voiceChannel;
+	  if (voiceChannel === undefined) {
+      message.reply('Join a voice channel first!');
+      return;
+	  }
+	  voiceChannel.leave();
+	  this.queue = [];
+	  return;
+  }
 
   addToQueue(voiceChannel, sound, message) {
     this.queue.push({ name: sound, channel: voiceChannel, message });
@@ -116,9 +152,11 @@ class SoundBot extends Discord.Client {
     const nextSound = this.queue.shift();
     const file = Util.getPathForSound(nextSound.name);
     const voiceChannel = this.channels.get(nextSound.channel);
+	// const connection = voiceChannel.connection();
 
-    voiceChannel.join().then((connection) => {
+      voiceChannel.join().then((connection) => {
       const dispatcher = connection.playFile(file);
+	 // const dispatcher = connection.playFile(file);
       dispatcher.on('end', () => {
         Util.updateCount(nextSound.name);
         if (config.get('deleteMessages') === true) nextSound.message.delete();
@@ -130,9 +168,10 @@ class SoundBot extends Discord.Client {
 
         this.playSoundQueue();
       });
-    }).catch((error) => {
-      console.log('Error occured!');
-      console.log(error);
+    })
+	.catch((error) => {
+     console.log('Error occured!');
+     console.log(error);
     });
   }
 }

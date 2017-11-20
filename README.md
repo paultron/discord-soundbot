@@ -9,6 +9,7 @@ A Bot for Discord to play your favorite sounds or music.
 
 + As per [discord.js](https://github.com/hydrabolt/discord.js#installation), **Node.js v6.0.0** or newer is required.
 + Due to using voice functionality **FFmpeg** is required.
++ Also requires **Python 2.7**
 
 
 ### Installation guide
@@ -35,6 +36,9 @@ Type `!commands` to print the following list of available commands.
 
 ```
 !commands              Show this message
+!uptime                Shows the uptime of the bot
+!joinvoice             Joins the voice channel you're in
+!leavevoice            Leaves the voice channel you're in
 !sounds                Show available sounds
 !mostplayed            Show 15 most used sounds
 !<sound>               Play the specified sound
