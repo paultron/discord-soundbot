@@ -15,4 +15,4 @@ const message = [
   `https://discordapp.com/oauth2/authorize?client_id=${config.get('client_id')}&scope=bot`
 ].join('\n');
 
-console.log(message); // eslint-disable-line no-console
+// console.log(message); // eslint-disable-line no-console
